@@ -10,9 +10,8 @@
 #include <fstream>
 #include <iomanip>
 
-
 struct Dynamic_Sort {
-	// Identifies column n as the one to be sorted. 
+	// Identifies column n as the one to be sorted.
 	Dynamic_Sort(int paramA) { this->paramA = paramA; }
 	bool operator () (std::vector<double> i, std::vector<double> j) { return i[paramA] < j[paramA]; }
 
@@ -29,7 +28,6 @@ void Print_Vector(std::vector<std::vector<double>> Vec) {
 }
 
 double Get_Reward(double Prob) {
-
 	// Return reward for playing 10 games on a given slot machine which is identified by it predetermined probability.
 	// Slot machine probability is set in main function.
 
@@ -38,10 +36,10 @@ double Get_Reward(double Prob) {
 	std::mt19937 Generate(rd());
 	std::uniform_real_distribution<double> Probibility(0, 1);
 
-	for (int i = 0; i < 10; i++) { 
-		if (Probibility(Generate) < Prob){
-			Reward++; 
-		} 
+	for (int i = 0; i < 10; i++) {
+		if (Probibility(Generate) < Prob) {
+			Reward++;
+		}
 	}
 	return Reward;
 }
@@ -50,14 +48,14 @@ double Get_Reward(double Prob) {
 //std::vector<double> Get_Best_Bandit(std::vector<std::vector<double>> AV) {
 //	std::vector<std::vector<double>>Averages;
 //	std::vector<double> Bandit_Ave;
-//	
+//
 //	std::sort(AV.begin(), AV.end());
 //
 //	int ID = AV[0][0];
 //	int count = 0;
 //	double sum = 0;
 //	for (std::vector<std::vector<double>>::size_type i = 0; i < AV.size(); i++) {
-//		
+//
 //		if (AV[i][0] == ID) {
 //			count++;
 //			sum += AV[i][1];
@@ -73,9 +71,9 @@ double Get_Reward(double Prob) {
 //	Bandit_Ave.push_back(ID);
 //	Bandit_Ave.push_back(sum / count);
 //	Averages.push_back(Bandit_Ave);
-//	
+//
 //	std::sort(Averages.rbegin(), Averages.rend(), Dynamic_Sort(1));
-//	
+//
 //	return Averages[0];
 //}
 //
@@ -88,9 +86,7 @@ std::vector<double> Get_Best_Machine(std::vector<std::vector<double>>AV2) {
 	return AV2[0];
 }
 
-
 int main() {
-
 	// Set up random number generation
 	std::random_device rd;
 	std::mt19937 Generate(rd());
@@ -103,7 +99,7 @@ int main() {
 	double Eps = 0.2; // defines how likly we just select the current best arm.
 	double Best_Average = 0; // Current payout for the 'best' machine.
 	std::vector<double> Slot_Machine; // Stores probabilites of each machine
-	
+
 	// Set inital probibilites for each slot machine
 	for (int i = 0; i < n; i++) {
 		Slot_Machine.push_back(Probibility(Generate));
@@ -124,7 +120,7 @@ int main() {
 
 	// Play a total of 10000 games.
 	for (int i = 0; i < 10000; i++) {
-		double X = Probibility(Generate);	// Generates a random probability. 
+		double X = Probibility(Generate);	// Generates a random probability.
 											// If this is less than Eps the current best machine is played else a machine is choosen at random.
 		std::vector<double> ThisAV;			// Stores current action
 		if (X < Eps) {
@@ -147,10 +143,10 @@ int main() {
 			Best_Arm = Best_Bandit[0];
 			Best_Average = Best_Bandit[2];
 		}
-		
+
 		// Print current results.
 		if (i % 1000 == 0) { std::cout << "Best Bandit: " << Best_Arm << "   Average Reward: " << Best_Average << std::endl; }
-		Out <<std::setw(5)<< i << "  " << Best_Arm << "  " << Best_Average << std::endl;
+		Out << std::setw(5) << i << "  " << Best_Arm << "  " << Best_Average << std::endl;
 	}
 
 	Out << std::endl << std::endl;
@@ -169,7 +165,6 @@ int main() {
 	}
 	Out.close();
 
-
 	// Version 3
 	std::vector<std::vector<double>> AV3;
 	for (int a = 0; a < n; a++) {
@@ -183,21 +178,21 @@ int main() {
 	std::ofstream Out2("Out2.txt");
 	// ver 3 softmax
 	std::cout << "\n Ver 3.0\n\n";
-	
+
 	std::vector<double>Weight_Array;
 	for (int i = 0; i < n; i++) { Weight_Array.push_back(1); } // initalise array to 0 for each machine.
 	std::discrete_distribution<int> Weights(Weight_Array.begin(), Weight_Array.end());
 	for (int i = 0; i < 10000; i++) {
 		Best_Arm = Weights(Generate);
 		std::vector<double> ThisAV;
-		
+
 		ThisAV.push_back(Best_Arm);
 		ThisAV.push_back(Get_Reward(Slot_Machine[Best_Arm]));
 		AV3[Best_Arm][1] = AV3[Best_Arm][1]++;
 		AV3[Best_Arm][2] = AV3[Best_Arm][2] + ((ThisAV[1] - AV3[Best_Arm][2]) / AV3[Best_Arm][1]);
 
-		for (int j = 0; j < n; j++) {Weight_Array[j] = AV3[j][2]/i; } // convert ave to % for weighted random no.
-		
+		for (int j = 0; j < n; j++) { Weight_Array[j] = AV3[j][2] / i; } // convert ave to % for weighted random no.
+
 		std::vector<double> Best_Bandit = Get_Best_Machine(AV3);
 		Best_Arm = Best_Bandit[0];
 		Best_Average = Best_Bandit[2];
